@@ -138,13 +138,19 @@ func (e *G1) Unmarshal(m []byte) ([]byte, error) {
 	} else {
 		e.p.x, e.p.y = gfP{0}, gfP{0}
 	}
+
 	var err error
-	if err = e.p.x.Unmarshal(m); err != nil {
+	var isInf bool
+	var isNeg bool
+
+	if err = e.p.x.Unmarshal(m[:32], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.Unmarshal(m[numBytes:]); err != nil {
+
+	if err = e.p.y.Unmarshal(m[32:64], &isInf, &isNeg); err != nil {
 		return nil, err
 	}
+
 	// Encode into Montgomery form and ensure it's on the curve
 	montEncode(&e.p.x, &e.p.x)
 	montEncode(&e.p.y, &e.p.y)
@@ -272,19 +278,26 @@ func (e *G2) Unmarshal(m []byte) ([]byte, error) {
 	if e.p == nil {
 		e.p = &twistPoint{}
 	}
+
 	var err error
-	if err = e.p.x.x.Unmarshal(m); err != nil {
+	var isInf bool
+	var isNeg bool
+
+	if err = e.p.x.x.Unmarshal(m[:32], &isInf, &isInf); err != nil {
 		return nil, err
 	}
-	if err = e.p.x.y.Unmarshal(m[numBytes:]); err != nil {
+	if err = e.p.x.y.Unmarshal(m[32:64], &isInf, &isInf); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.x.Unmarshal(m[2*numBytes:]); err != nil {
+
+	if err = e.p.y.x.Unmarshal(m[64:96], &isInf, &isInf); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.y.Unmarshal(m[3*numBytes:]); err != nil {
+
+	if err = e.p.y.y.Unmarshal(m[96:128], &isInf, &isNeg); err != nil {
 		return nil, err
 	}
+
 	// Encode into Montgomery form and ensure it's on the curve
 	montEncode(&e.p.x.x, &e.p.x.x)
 	montEncode(&e.p.x.y, &e.p.x.y)
@@ -442,40 +455,40 @@ func (e *GT) Unmarshal(m []byte) ([]byte, error) {
 	}
 
 	var err error
-	if err = e.p.x.x.x.Unmarshal(m); err != nil {
+	if err = e.p.x.x.x.Unmarshal(m, nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.x.x.y.Unmarshal(m[numBytes:]); err != nil {
+	if err = e.p.x.x.y.Unmarshal(m[numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.x.y.x.Unmarshal(m[2*numBytes:]); err != nil {
+	if err = e.p.x.y.x.Unmarshal(m[2*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.x.y.y.Unmarshal(m[3*numBytes:]); err != nil {
+	if err = e.p.x.y.y.Unmarshal(m[3*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.x.z.x.Unmarshal(m[4*numBytes:]); err != nil {
+	if err = e.p.x.z.x.Unmarshal(m[4*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.x.z.y.Unmarshal(m[5*numBytes:]); err != nil {
+	if err = e.p.x.z.y.Unmarshal(m[5*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.x.x.Unmarshal(m[6*numBytes:]); err != nil {
+	if err = e.p.y.x.x.Unmarshal(m[6*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.x.y.Unmarshal(m[7*numBytes:]); err != nil {
+	if err = e.p.y.x.y.Unmarshal(m[7*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.y.x.Unmarshal(m[8*numBytes:]); err != nil {
+	if err = e.p.y.y.x.Unmarshal(m[8*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.y.y.Unmarshal(m[9*numBytes:]); err != nil {
+	if err = e.p.y.y.y.Unmarshal(m[9*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.z.x.Unmarshal(m[10*numBytes:]); err != nil {
+	if err = e.p.y.z.x.Unmarshal(m[10*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
-	if err = e.p.y.z.y.Unmarshal(m[11*numBytes:]); err != nil {
+	if err = e.p.y.z.y.Unmarshal(m[11*numBytes:], nil, nil); err != nil {
 		return nil, err
 	}
 	montEncode(&e.p.x.x.x, &e.p.x.x.x)
