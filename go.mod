@@ -1,4 +1,4 @@
-module github.com/Overclock-Validator/go-ethereum
+module github.com/smcio/go-ethereum
 
 go 1.23.0
 
